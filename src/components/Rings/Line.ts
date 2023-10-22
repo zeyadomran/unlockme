@@ -6,6 +6,7 @@ class Line {
 	x2: number;
 	y2: number;
 	p5: p5Types;
+
 	static strokeWeight = 5;
 	static color = 255;
 

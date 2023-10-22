@@ -6,78 +6,99 @@ import Ball from './Ball';
 import Line from './Line';
 import Hoop from './Hoop';
 import { shuffle } from 'lodash/fp';
+import Link from 'next/link';
 
 const Rings: FC = () => {
-	const BALL_RADIUS: number = 10;
 	let ball: Ball;
 	let start = 0;
 	let images: { [key: string]: any } = {};
-	const [CANVAS_WIDTH, setCANVAS_WIDTH] = useState(0);
-	const [CANVAS_HEIGHT, setCANVAS_HEIGHT] = useState(0);
-	const [touches, setTouches] = useState<Line[]>([]);
+	const [canvasWidth, setcanvasWidth] = useState(0);
+	const [canvasHeight, setCanvasHeight] = useState(0);
+	const [header, setHeader] = useState<HTMLElement | null>(null);
+	const [password, setPassword] = useState<string[]>([]);
+	const [hoopsCrossed, setHoopsCrossed] = useState<string[] | undefined>([]);
+	const [lines, setLines] = useState<Line[]>([]);
 	const [hoops, setHoops] = useState<Hoop[]>([]);
-
 	const Sketch = dynamic(() => import('react-p5').then((mod) => mod.default), {
 		ssr: false,
 	});
+
+	useEffect(() => {
+		setHeader(document.getElementById('header'));
+		setPassword(
+			JSON.parse(localStorage.getItem('data') ?? '{}').password ||
+				shuffle(Hoop.colors).slice(0, 4)
+		);
+	}, []);
 	useEffect(() => {
 		let hoopsTemp = [];
-		const hoopIncrement = (CANVAS_WIDTH - Hoop.width) / 6;
-		for (let i = 0; i < 6; i++) {
+		const hoopIncrement = (canvasWidth - Hoop.width) / 6;
+		for (let i = 0; i < Hoop.rows; i++) {
 			const colors = shuffle([...Hoop.colors]);
 			for (let ii = 0; ii < colors.length; ii++) {
 				hoopsTemp.push(
 					new Hoop(
-						ii * hoopIncrement + 25,
-						i * ((CANVAS_HEIGHT - 200) / 6) + 200,
+						(ii + 1) * hoopIncrement - 30,
+						(i + 1) * ((canvasHeight - Hoop.height) / Hoop.rows) - 50,
 						colors[ii]
 					)
 				);
 			}
 		}
 		setHoops(hoopsTemp);
-	}, [CANVAS_WIDTH, CANVAS_HEIGHT]);
+	}, [canvasWidth, canvasHeight]);
 
 	const setup = (p5: p5Types, canvasParentRef: Element) => {
-		setCANVAS_HEIGHT(p5.windowHeight);
-		setCANVAS_WIDTH(p5.windowWidth);
-		ball = new Ball(p5.windowWidth / 2, 20, BALL_RADIUS, p5);
-		p5.createCanvas(p5.windowWidth, p5.windowHeight).parent(canvasParentRef);
+		setCanvasHeight(p5.windowHeight - (header?.offsetHeight ?? 0));
+		setcanvasWidth(p5.windowWidth);
+		p5.createCanvas(
+			p5.windowWidth,
+			p5.windowHeight - (header?.offsetHeight ?? 0)
+		).parent(canvasParentRef);
 		start = p5.millis();
 		for (let color of Hoop.colors) {
-			images[color] = p5.loadImage(color + '.png');
+			images[color] = p5.loadImage('../' + color + '.png');
 		}
-		images['ball'] = p5.loadImage('ball.svg');
+		ball = new Ball(
+			p5.windowWidth / 2,
+			20,
+			p5,
+			p5.loadImage('../ball.svg'),
+			(colors?: string[]) => setHoopsCrossed(colors)
+		);
 	};
 
 	const draw = (p5: p5Types) => {
 		p5.background(0);
 
-		for (let touch of touches) {
-			touch.draw();
+		for (let line of lines) {
+			line.draw();
 		}
 
-		ball.draw(images['ball']);
+		ball.draw();
+
 		for (let hoop of hoops) {
 			hoop.draw(p5, images[hoop.color]);
 		}
 		if (p5.millis() >= start + 5000) {
-			ball.update(touches, hoops, CANVAS_WIDTH, CANVAS_HEIGHT);
+			ball.update(lines, hoops, canvasWidth, canvasHeight, password);
 		}
 	};
 
 	const touchStarted = (p5: p5Types) => {
 		const touch = p5.touches[0] as any;
-		setTouches((touches) => {
-			touches.push(new Line(touch.x, touch.y, p5));
-			return touches;
-		});
+		if (touch && touch.y >= 0) {
+			setLines((touches) => {
+				touches.push(new Line(touch.x, touch.y, p5));
+				return touches;
+			});
+		}
 	};
 
 	const touchMoved = (p5: p5Types) => {
 		const touch = p5.touches[0] as any;
-		if (touch) {
-			setTouches((touches) => {
+		if (touch && touch.y >= 0) {
+			setLines((touches) => {
 				touches[touches.length - 1].x2 = touch.x;
 				touches[touches.length - 1].y2 = touch.y;
 				return touches;
@@ -86,12 +107,36 @@ const Rings: FC = () => {
 	};
 
 	return (
-		<Sketch
-			setup={setup}
-			draw={draw}
-			touchStarted={touchStarted}
-			touchMoved={touchMoved}
-		/>
+		<>
+			{hoopsCrossed?.length === 4 ? (
+				<div className="flex flex-col gap-4 mb-auto pt-12">
+					<div className="text-white">Correct hoops!</div>
+					<Link
+						href="/touch"
+						className="text-white bg-blue-600 hover:bg-blue-800 cursor-pointer w-fit p-2"
+					>
+						Lock phone
+					</Link>
+				</div>
+			) : hoopsCrossed?.length === 0 ? (
+				<Sketch
+					setup={setup}
+					draw={draw}
+					touchStarted={touchStarted}
+					touchMoved={touchMoved}
+				/>
+			) : (
+				<div className="flex flex-col gap-4 mb-auto pt-12">
+					<div className="text-white">Incorrect hoops!</div>
+					<button
+						className="text-white bg-blue-600 hover:bg-blue-800 cursor-pointer w-fit p-2"
+						onClick={() => setHoopsCrossed([])}
+					>
+						Try again
+					</button>
+				</div>
+			)}
+		</>
 	);
 };
 
