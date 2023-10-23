@@ -59,3 +59,7 @@ h6 {
 canvas {
   display: block;
 }
+
+.flip {
+  transform: scaleX(-1);
+}

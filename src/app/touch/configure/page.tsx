@@ -17,11 +17,17 @@ export default function Home() {
 	};
 
 	const savePassword = () => {
-		localStorage.setItem('data', JSON.stringify({ password }));
+		localStorage.setItem(
+			'data',
+			JSON.stringify({
+				touch: password,
+				sensor: JSON.parse(localStorage.getItem('data') ?? '{}').sensor,
+			})
+		);
 	};
 
 	useEffect(() => {
-		const p = JSON.parse(localStorage.getItem('data') ?? '{}').password;
+		const p = JSON.parse(localStorage.getItem('data') ?? '{}').touch;
 		if (p) {
 			setPassword(p);
 		}

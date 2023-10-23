@@ -10,9 +10,12 @@ export default function Home() {
 			>
 				Touch based
 			</Link>
-			<button className="text-white bg-blue-600 hover:bg-blue-800 cursor-pointer w-full p-4">
+			<Link
+				href="/sensor"
+				className="text-white bg-blue-600 hover:bg-blue-800 cursor-pointer w-full p-4"
+			>
 				Sensor based
-			</button>
+			</Link>
 		</div>
 	);
 }

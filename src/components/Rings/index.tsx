@@ -26,7 +26,7 @@ const Rings: FC = () => {
 	useEffect(() => {
 		setHeader(document.getElementById('header'));
 		setPassword(
-			JSON.parse(localStorage.getItem('data') ?? '{}').password ||
+			JSON.parse(localStorage.getItem('data') ?? '{}').touch ||
 				shuffle(Hoop.colors).slice(0, 4)
 		);
 	}, []);

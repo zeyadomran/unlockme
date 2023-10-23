@@ -24,7 +24,7 @@ export default function RootLayout({
 			<Head>
 				<title>Unlock Me</title>
 			</Head>
-			<body className={inter.className}>
+			<body className={inter.className} id="body">
 				<div className="flex flex-col justify-between items-center bg-black w-full h-full">
 					<div
 						className="text-white w-full py-1 px-12 flex flex-col gap-4"
@@ -48,7 +48,13 @@ export default function RootLayout({
 						<div className="flex w-full items-center justify-center relative">
 							{pathName !== '/' && (
 								<Link
-									href={pathName === '/touch' ? '../' : '/touch'}
+									href={
+										pathName === '/touch' || pathName === '/sensor'
+											? '../'
+											: pathName.includes('/touch')
+											? '/touch'
+											: '/sensor'
+									}
 									className="absolute top-1/2 left-0 -translate-y-1/2 w-4 h-4 cursor-pointer"
 								>
 									<MdKeyboardBackspace />
