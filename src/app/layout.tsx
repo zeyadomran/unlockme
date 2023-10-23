@@ -10,6 +10,7 @@ import {
 	PiWifiHighBold,
 } from 'react-icons/pi';
 import './globals.css';
+import { useEffect, useState } from 'react';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,6 +19,26 @@ export default function RootLayout({
 }: {
 	children: React.ReactNode;
 }) {
+	const [date, setDate] = useState<string>('');
+
+	const [time, setTime] = useState<string>('');
+
+	useEffect(() => {
+		setDate(
+			new Date().toLocaleDateString('en', {
+				dateStyle: 'medium',
+			})
+		);
+		setTime(
+			new Date()
+				.toLocaleTimeString('en', {
+					timeStyle: 'short',
+					hour12: true,
+				})
+				.replace(/(PM)|(AM)/, '')
+				.trim()
+		);
+	}, []);
 	const pathName = usePathname();
 	return (
 		<html lang="en">
@@ -33,11 +54,7 @@ export default function RootLayout({
 						<div className="flex items-center justify-between w-full">
 							<div className="flex items-center justify-between gap-2">
 								<p className="font-bold">Bell</p>
-								<p className="text-sm">
-									{new Date().toLocaleDateString('en', {
-										dateStyle: 'medium',
-									})}
-								</p>
+								<p className="text-sm">{date}</p>
 							</div>
 							<div className="flex items-center justify-between gap-2">
 								<PiCellSignalFullBold />
@@ -60,15 +77,7 @@ export default function RootLayout({
 									<MdKeyboardBackspace />
 								</Link>
 							)}
-							<p className="text-4xl font-bold italic">
-								{new Date()
-									.toLocaleTimeString('en', {
-										timeStyle: 'short',
-										hour12: true,
-									})
-									.replace(/(PM)|(AM)/, '')
-									.trim()}
-							</p>
+							<p className="text-4xl font-bold italic">{time}</p>
 						</div>
 					</div>
 					{children}
