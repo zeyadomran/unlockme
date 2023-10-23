@@ -68,7 +68,7 @@ export default function Home() {
 				<p className="text-white px-12">Press basket to configure password!</p>
 			)}
 			<div className="flex items-center justify-between">
-				{Hoop.colors.map((color) => {
+				{new Hoop().colors.map((color) => {
 					return (
 						<button
 							key={color}
@@ -78,8 +78,8 @@ export default function Home() {
 							<Image
 								src={'/' + color + '.png'}
 								alt={color}
-								width={Hoop.width}
-								height={Hoop.height}
+								width={new Hoop().width}
+								height={new Hoop().height}
 							/>
 						</button>
 					);

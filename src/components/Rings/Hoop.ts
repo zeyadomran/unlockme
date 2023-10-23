@@ -5,23 +5,23 @@ class Hoop {
 	y: number;
 	color: string;
 
-	static colors = ['red', 'green', 'blue', 'yellow', 'magenta', 'white'];
-	static width = 50;
-	static height = 50;
-	static rows = 4;
-	static svgName = 'hoop.svg';
+	colors = ['red', 'green', 'blue', 'yellow', 'magenta', 'white'];
+	width = 50;
+	height = 50;
+	rows = 4;
+	svgName = 'hoop.svg';
 
-	constructor(x: number, y: number, color: string) {
-		this.x = x;
-		this.y = y;
-		this.color = color;
+	constructor(x?: number, y?: number, color?: string) {
+		this.x = x ?? 0;
+		this.y = y ?? 0;
+		this.color = color ?? this.colors[0];
 	}
 
 	draw(p5: p5Types, image: p5Types.Image) {
 		p5.color(this.color);
 		p5.fill(this.color);
 		p5.strokeWeight(0);
-		p5.image(image, this.x, this.y, Hoop.width, Hoop.height);
+		p5.image(image, this.x, this.y, this.width, this.height);
 	}
 }
 

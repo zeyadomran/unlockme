@@ -9,8 +9,8 @@ class Ball {
 	image: p5Types.Image;
 	collected: string[] = [];
 	onComplete: (colors?: string[]) => void;
-	static color = 255;
-	static radius = 12;
+	color = 255;
+	radius = 12;
 
 	constructor(
 		x: number,
@@ -27,14 +27,14 @@ class Ball {
 	}
 
 	draw() {
-		this.p5.color(Ball.color);
-		this.p5.fill(Ball.color);
+		this.p5.color(this.color);
+		this.p5.fill(this.color);
 		this.p5.image(
 			this.image,
-			this.x - Ball.radius,
-			this.y - Ball.radius,
-			Ball.radius * 2,
-			Ball.radius * 2
+			this.x - this.radius,
+			this.y - this.radius,
+			this.radius * 2,
+			this.radius * 2
 		);
 	}
 
@@ -47,46 +47,46 @@ class Ball {
 	) {
 		let moved = false;
 		for (let line of lines) {
-			const rightEdge = this.x + Ball.radius;
-			const leftEdge = this.x - Ball.radius;
-			const bottomEdge = this.y + Ball.radius;
+			const rightEdge = this.x + this.radius;
+			const leftEdge = this.x - this.radius;
+			const bottomEdge = this.y + this.radius;
 			const intersectDetected = this.isIntersect(line);
 			if (
 				((line.x1 <= leftEdge && line.x2 >= this.x) ||
-					(line.x2 >= rightEdge && line.x2 <= this.x) ||
+					(line.x2 >= rightEdge && line.x1 <= this.x) ||
 					(line.x1 >= leftEdge && line.x2 <= this.x) ||
-					(line.x2 <= rightEdge && line.x2 >= this.x)) &&
+					(line.x2 <= rightEdge && line.x1 >= this.x)) &&
 				((line.y1 <= bottomEdge && line.y2 >= bottomEdge) ||
 					(line.y1 >= bottomEdge && line.y2 <= bottomEdge)) &&
 				intersectDetected
 			) {
-				const increment = Line.getGradient(line) * 10;
+				const increment = line.getGradient(line) * 10;
 				this.x = this.x + increment;
 				this.y =
-					Line.getYGivenX(line, this.x) - Line.strokeWeight - Ball.radius;
+					line.getYGivenX(line, this.x) - line.strokeWeight - this.radius;
 				moved = true;
 			}
 		}
 
 		for (let i = 0; i < hoops.length; i++) {
 			const hoop = hoops[i];
-			const bottomEdge = this.y + Ball.radius;
+			const bottomEdge = this.y + this.radius;
 			if (
 				hoop.y <= bottomEdge &&
-				hoop.y + Hoop.height >= bottomEdge &&
+				hoop.y + hoop.height >= bottomEdge &&
 				hoop.x <= this.x &&
-				hoop.x + Hoop.width >= this.x &&
-				!this.collected[Math.floor(i / Hoop.colors.length)] &&
-				password[Math.floor(i / Hoop.colors.length)] === hoop.color
+				hoop.x + hoop.width >= this.x &&
+				!this.collected[Math.floor(i / hoop.colors.length)] &&
+				password[Math.floor(i / hoop.colors.length)] === hoop.color
 			) {
 				this.collected.push(hoop.color);
 			}
 		}
 
 		if (
-			this.y + Ball.radius >= canvasHeight ||
-			this.x + Ball.radius >= canvasWidth ||
-			this.x - Ball.radius <= 0
+			this.y + this.radius >= canvasHeight ||
+			this.x + this.radius >= canvasWidth ||
+			this.x - this.radius <= 0
 		) {
 			this.onComplete(this.collected.length > 0 ? this.collected : undefined);
 			this.p5.noLoop();
@@ -99,9 +99,9 @@ class Ball {
 	}
 
 	isIntersect(line: Line) {
-		const y = Line.getYGivenX(line, this.x);
+		const y = line.getYGivenX(line, this.x);
 		const delta = Math.abs(y - this.y);
-		if (delta < Ball.radius + Line.strokeWeight) {
+		if (delta < this.radius + line.strokeWeight) {
 			return true;
 		}
 		return false;

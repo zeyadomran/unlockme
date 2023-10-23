@@ -27,19 +27,20 @@ const Rings: FC = () => {
 		setHeader(document.getElementById('header'));
 		setPassword(
 			JSON.parse(localStorage.getItem('data') ?? '{}').touch ||
-				shuffle(Hoop.colors).slice(0, 4)
+				shuffle(new Hoop().colors).slice(0, 4)
 		);
 	}, []);
 	useEffect(() => {
 		let hoopsTemp = [];
-		const hoopIncrement = (canvasWidth - Hoop.width) / 6;
-		for (let i = 0; i < Hoop.rows; i++) {
-			const colors = shuffle([...Hoop.colors]);
+		const hoop = new Hoop();
+		const hoopIncrement = (canvasWidth - hoop.width) / 6;
+		for (let i = 0; i < hoop.rows; i++) {
+			const colors = shuffle([...hoop.colors]);
 			for (let ii = 0; ii < colors.length; ii++) {
 				hoopsTemp.push(
 					new Hoop(
 						(ii + 1) * hoopIncrement - 30,
-						(i + 1) * ((canvasHeight - Hoop.height) / Hoop.rows) - 50,
+						(i + 1) * ((canvasHeight - hoop.height) / hoop.rows) - 50,
 						colors[ii]
 					)
 				);
@@ -56,7 +57,7 @@ const Rings: FC = () => {
 			p5.windowHeight - (header?.offsetHeight ?? 0)
 		).parent(canvasParentRef);
 		start = p5.millis();
-		for (let color of Hoop.colors) {
+		for (let color of new Hoop().colors) {
 			images[color] = p5.loadImage('../' + color + '.png');
 		}
 		ball = new Ball(

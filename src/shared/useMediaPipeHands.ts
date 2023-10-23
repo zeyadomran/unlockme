@@ -81,7 +81,7 @@ function useMediaPipeHands() {
 
 								setSlope(
 									Math.round(
-										Line.getGradient({
+										new Line().getGradient({
 											x1: thumbPos.x * canvasEl.current.offsetWidth,
 											y1: thumbPos.y * canvasEl.current.offsetHeight,
 											x2: pinkyPos.x * canvasEl.current.offsetWidth,
